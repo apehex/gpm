@@ -1,8 +1,8 @@
 # MAPPINGS ####################################################################
 
-def mappings(voc: list) -> dict:
-    __itos = {__i: __c for __i, __c in enumerate(voc)}
-    __stoi = {__c: __i for __i, __c in enumerate(voc)}
+def mappings(vocabulary: list) -> dict:
+    __itos = {__i: __c for __i, __c in enumerate(vocabulary)}
+    __stoi = {__c: __i for __i, __c in enumerate(vocabulary)}
     # blank placeholder
     __blank_c = __itos[0] # chr(0)
     __blank_i = 0

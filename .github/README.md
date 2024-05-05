@@ -32,7 +32,7 @@ Even though the process generates high entropy passwords, it is deterministic an
 Only 3 arguments are required:
 
 ```shell
-python  mlable/models/gpm/main.py --key 'never seen before combination of letters' --target 'http://example.com' --id 'user@e.mail'
+python  gpm/main.py --key 'never seen before combination of letters' --target 'http://example.com' --id 'user@e.mail'
 # YRLabEDKqWQrN6JF
 ```
 
@@ -43,7 +43,7 @@ python  mlable/models/gpm/main.py --key 'never seen before combination of letter
 If they are not specified on the command line, the user will be prompted during the execution:
 
 ```shell
-python  mlable/models/gpm/main.py
+python  gpm/main.py
 # > Master key:
 # never seen before combination of letters
 # > Login target:
