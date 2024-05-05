@@ -12,7 +12,7 @@ import re
 
 import tensorflow as tf
 
-import mlable.inputs.vocabulary as _miv
+import gpm.pipeline
 
 # DEFAULT INPUT VOCABULARY ####################################################
 
@@ -113,7 +113,7 @@ def tensor(feed: 'Iterable[int]', length: int, context: int) -> tf.Tensor:
 def password(model: tf.keras.Model, x: tf.Tensor, itos: callable) -> str:
     __y = tf.squeeze(model(x, training=False))
     __p = list(tf.argmax(__y, axis=-1).numpy())
-    return _miv.decode(__p, itos=itos)
+    return gpm.pipeline.decode(__p, itos=itos)
 
 # PROCESS #####################################################################
 
@@ -134,15 +134,15 @@ def process(
     # seed to generate the model weights randomly
     __seed = seed(key=master_key)
     # input vocabulary
-    __input_mappings = _miv.mappings(vocabulary=input_vocabulary)
+    __input_mappings = gpm.pipeline.mappings(vocabulary=input_vocabulary)
     __input_dim = len(input_vocabulary)
     # output vocabulary
     __output_vocabulary = compose(lower=include_lower, upper=include_upper, digits=include_digits, symbols=include_symbols)
-    __output_mappings = _miv.mappings(vocabulary=__output_vocabulary)
+    __output_mappings = gpm.pipeline.mappings(vocabulary=__output_vocabulary)
     __output_dim = len(__output_vocabulary)
     # inputs
     __inputs = preprocess(target=login_target, login=login_id)
-    __source = _miv.encode(text=__inputs, stoi=__input_mappings['encode'])
+    __source = gpm.pipeline.encode(text=__inputs, stoi=__input_mappings['encode'])
     __feed = feed(source=__source, nonce=password_nonce, dimension=__input_dim)
     __x = tensor(feed=__feed, length=password_length, context=model_context_dim)
     # model
