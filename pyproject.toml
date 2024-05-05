@@ -1,18 +1,15 @@
 [tool.poetry]
-name = "mlable"
-version = "0.0.1"
-description = "Getting up to speed on ML with atomic projects."
+name = "gpm"
+version = "0.1.0"
+description = "GPM: Generative Password Manager."
 authors = ["apehex <apehex@protonmail.com>"]
 readme = ".github/README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.10, <3.12"
 tensorflow = ">=2.14"
-tensorflow-datasets = ">=4.9"
-torch = ">=2.2"
 
 [tool.poetry.group.dev.dependencies]
-jupyterlab = "*"
 pytest = "*"
 
 [build-system]
