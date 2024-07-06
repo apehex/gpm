@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gpm"
-version = "0.1.0"
+version = "0.1.1"
 description = "GPM: Generative Password Manager."
 authors = ["apehex <17317183+apehex@users.noreply.github.com>"]
 readme = ".github/README.md"
