@@ -41,8 +41,7 @@ N_PASSWORD_NONCE = 1
 # HYPER PARAMETERS ############################################################
 
 def seed(key: str) -> int:
-    __key = ''.join(__c for __c in key if ord(__c) < 128) # keep only ASCII characters
-    __hash = hashlib.sha256(string=__key.encode('utf-8')).hexdigest()
+    __hash = hashlib.sha256(string=key.encode('utf-8')).hexdigest()
     return int(__hash[:8], 16) # take the first 4 bytes: the seed is lower than 2 ** 32
 
 # VOCABULARY ##################################################################
@@ -175,8 +174,6 @@ def main():
             __args['master_key'] = input('> Master key:\n')
         if not __args.get('login_target', ''):
             __args['login_target'] = input('> Login target:\n')
-        if not __args.get('login_id', ''):
-            __args['login_id'] = input('> Login id:\n')
         # generate the password
         __password = process(
             input_vocabulary=INPUT_VOCABULARY,
