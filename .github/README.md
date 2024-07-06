@@ -1,5 +1,7 @@
 # GPM: Generative Password Manager
 
+<img src="header.png" alt="Neural tokenization" title="Source: Image by Author and generated with MidJourney" width="100%" style="margin: auto;"/>
+
 > Stateless password manager, powered by ML neural networks.
 
 Password management is up there with cookie popups and ads, a major pain in the ass.
