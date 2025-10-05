@@ -1,3 +1,16 @@
+# VOCABULARY SECTIONS ##########################################################
+
+BANNED = ''.join(chr(__i) for __i in (0x20, 0x22, 0x27, 0x28, 0x29, 0x5b, 0x5c, 0x5d, 0x60, 0x7b, 0x7c, 0x7d))  #  "\'()[\\]`{|}
+DIGITS = '0123456789'                                                                                           # 0-9
+UPPERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'                                                                           # A-Z
+LOWERS = UPPERS.lower()                                                                                         # a-z
+SYMBOLS = ''.join(set(chr(__i) for __i in range(0x20, 0x7f)) - set(BANNED + DIGITS + UPPERS + LOWERS))          # =,%~?>-.*^@&_+</!$#;:
+
+# VOCABULARY ###################################################################
+
+def compose(lower: bool=True, upper: bool=True, digits: bool=True, symbols: bool=False) -> str:
+    return sorted(set(lower * LOWERS + upper * UPPERS + digits * DIGITS + symbols * SYMBOLS))
+
 # MAPPINGS ####################################################################
 
 def mappings(vocabulary: list) -> dict:
