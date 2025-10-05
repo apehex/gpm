@@ -1,0 +1,98 @@
+import itertools
+import re
+
+import tensorflow as tf
+
+import gpm.model
+import gpm.vocabulary
+
+# DEFAULT VOCABULARIES #########################################################
+
+INPUT_VOCABULARY = ''.join(chr(__i) for __i in range(128)) # all ASCII characters
+OUTPUT_VOCABULARY = INPUT_VOCABULARY # placeholder
+
+# DEFAULT META #################################################################
+
+N_INPUT_DIM = len(INPUT_VOCABULARY) # all ASCII characters
+N_OUTPUT_DIM = N_INPUT_DIM # placeholder, it depends on the user settings
+
+N_CONTEXT_DIM = 8
+N_EMBEDDING_DIM = 128
+
+N_PASSWORD_DIM = 16
+N_PASSWORD_NONCE = 1
+
+# PREPROCESS ##################################################################
+
+def remove_prefix(text: str) -> str: # "github.com" and "https://github.com"
+    __r = r'^((?:ftp|https?):\/\/)'
+    return re.sub(pattern=__r, repl='', string=text, flags=re.IGNORECASE)
+
+def remove_suffix(text: str) -> str:
+    __r = r'(\/+)$'
+    return re.sub(pattern=__r, repl='', string=text, flags=re.IGNORECASE)
+
+def remove_spaces(text: str) -> str:
+    return text.replace(' ', '').replace('\t', '')
+
+def preprocess(target: str, login: str) -> list:
+    __left = remove_suffix(text=remove_prefix(text=remove_spaces(text=target.lower())))
+    __right = remove_spaces(text=login.lower())
+    return __left + '|' + __right
+
+# ENTROPY #####################################################################
+
+def accumulate(x: int, y: int, n: int) -> int:
+    return (x + y) % n
+
+def feed(source: list, nonce: int, dimension: int) -> iter:
+    __func = lambda __x, __y: accumulate(x=__x, y=__y + nonce, n=dimension) # add entropy by accumulating the encodings
+    return itertools.accumulate(iterable=itertools.cycle(source), func=__func) # infinite iterable
+
+# INPUTS ######################################################################
+
+def tensor(feed: 'Iterable[int]', length: int, context: int) -> tf.Tensor:
+    __x = [[next(feed) for _ in range(context)] for _ in range(length)]
+    return tf.constant(tf.convert_to_tensor(value=__x, dtype=tf.dtypes.int32))
+
+# OUTPUTS #####################################################################
+
+def password(model: tf.keras.Model, x: tf.Tensor, itos: callable) -> str:
+    __y = tf.squeeze(model(x, training=False))
+    __p = list(tf.argmax(__y, axis=-1).numpy())
+    return gpm.vocabulary.decode(__p, itos=itos)
+
+# PROCESS #####################################################################
+
+def process(
+    master_key: str,
+    login_target: str,
+    login_id: str,
+    password_length: int,
+    password_nonce: int,
+    include_lower: bool,
+    include_upper: bool,
+    include_digits: bool,
+    include_symbols: bool,
+    input_vocabulary: str=INPUT_VOCABULARY,
+    model_context_dim: int=N_CONTEXT_DIM,
+    model_embedding_dim: int=N_EMBEDDING_DIM
+) -> str:
+    # seed to generate the model weights randomly
+    __seed = gpm.model.seed(key=master_key)
+    # input vocabulary
+    __input_mappings = gpm.vocabulary.mappings(vocabulary=input_vocabulary)
+    __input_dim = len(input_vocabulary)
+    # output vocabulary
+    __output_vocabulary = gpm.vocabulary.compose(lower=include_lower, upper=include_upper, digits=include_digits, symbols=include_symbols)
+    __output_mappings = gpm.vocabulary.mappings(vocabulary=__output_vocabulary)
+    __output_dim = len(__output_vocabulary)
+    # inputs
+    __inputs = preprocess(target=login_target, login=login_id)
+    __source = gpm.vocabulary.encode(text=__inputs, stoi=__input_mappings['encode'])
+    __feed = feed(source=__source, nonce=password_nonce, dimension=__input_dim)
+    __x = tensor(feed=__feed, length=password_length, context=model_context_dim)
+    # model
+    __model = gpm.model.create(seed=__seed, n_input_dim=__input_dim, n_output_dim=__output_dim, n_context_dim=model_context_dim, n_embedding_dim=model_embedding_dim)
+    # password
+    return password(model=__model, x=__x, itos=__output_mappings['decode'])
