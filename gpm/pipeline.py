@@ -1,17 +1,19 @@
 # MAPPINGS ####################################################################
 
 def mappings(vocabulary: list) -> dict:
+    __dim = len(vocabulary)
+    # actual mappings
     __itos = {__i: __c for __i, __c in enumerate(vocabulary)}
     __stoi = {__c: __i for __i, __c in enumerate(vocabulary)}
     # blank placeholder
     __blank_c = __itos[0] # chr(0)
     __blank_i = 0
     # s => i
-    def __encode(c: str) -> int:
-        return __stoi.get(c, __blank_i)
+    def __encode(_c: str) -> int:
+        return __stoi.get(_c, __blank_i)
     # i => s
-    def __decode(i: int) -> str:
-        return __itos.get(i, __blank_c)
+    def __decode(_i: int) -> str:
+        return __itos.get(_i % __dim, __blank_c)
     # return both
     return {'encode': __encode, 'decode': __decode}
 
