@@ -29,8 +29,10 @@ def main():
             __args['master_key'] = input('> Master key:\n')
         if not __args.get('login_target', ''):
             __args['login_target'] = input('> Login target:\n')
+        if not __args.get('login_id', ''):
+            __args['login_id'] = input('> Login ID:\n')
         # generate the password
-        __password = process(
+        __password = gpm.pipeline.process(
             input_vocabulary=gpm.pipeline.INPUT_VOCABULARY,
             model_context_dim=gpm.pipeline.N_CONTEXT_DIM,
             model_embedding_dim=gpm.pipeline.N_EMBEDDING_DIM,
