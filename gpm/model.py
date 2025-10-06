@@ -31,9 +31,8 @@ def create(
     # head
     __model.add(tf.keras.layers.Reshape(target_shape=(n_context_dim * n_embedding_dim,), name='reshape'))
     __model.add(tf.keras.layers.Dense(units=n_output_dim, activation='tanh', use_bias=False, kernel_initializer=__dense_init, name='head'))
-    __model.add(tf.keras.layers.Softmax(axis=-1, name='softmax'))
     # compile
     __model.compile(
         optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),
-        loss=tf.keras.losses.CategoricalCrossentropy(from_logits=False, label_smoothing=0., axis=-1, reduction=tf.keras.losses.Reduction.SUM_OVER_BATCH_SIZE, name='loss'))
+        loss=tf.keras.losses.BinaryCrossentropy(from_logits=True, label_smoothing=0., axis=-1, reduction=tf.keras.losses.Reduction.SUM_OVER_BATCH_SIZE, name='loss'))
     return __model
