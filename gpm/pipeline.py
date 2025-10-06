@@ -35,9 +35,12 @@ def remove_suffix(text: str) -> str:
 def remove_spaces(text: str) -> str:
     return text.replace(' ', '').replace('\t', '')
 
+def filter_ascii(text: str) -> str:
+    return ''.join(__c for __c in text if ord(__c) < 128)
+
 def preprocess(target: str, login: str) -> list:
-    __left = remove_suffix(text=remove_prefix(text=remove_spaces(text=target.lower())))
-    __right = remove_spaces(text=login.lower())
+    __left = remove_suffix(remove_prefix(remove_spaces(filter_ascii(target.lower()))))
+    __right = remove_spaces(filter_ascii(login.lower()))
     return __left + '|' + __right
 
 # ENTROPY #####################################################################
@@ -70,10 +73,11 @@ def process(
     login_id: str,
     password_length: int,
     password_nonce: int,
-    include_lower: bool,
-    include_upper: bool,
+    include_lowers: bool,
+    include_uppers: bool,
     include_digits: bool,
     include_symbols: bool,
+    include_words: bool,
     input_vocabulary: str=INPUT_VOCABULARY,
     model_context_dim: int=N_CONTEXT_DIM,
     model_embedding_dim: int=N_EMBEDDING_DIM
@@ -84,7 +88,7 @@ def process(
     __input_mappings = gpm.vocabulary.mappings(vocabulary=input_vocabulary)
     __input_dim = len(input_vocabulary)
     # output vocabulary
-    __output_vocabulary = gpm.vocabulary.compose(lower=include_lower, upper=include_upper, digits=include_digits, symbols=include_symbols)
+    __output_vocabulary = gpm.vocabulary.compose(lowers=include_lowers, uppers=include_uppers, digits=include_digits, symbols=include_symbols, words=include_words)
     __output_mappings = gpm.vocabulary.mappings(vocabulary=__output_vocabulary)
     __output_dim = len(__output_vocabulary)
     # inputs

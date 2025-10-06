@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gpmanager"
-version = "0.2.0"
+version = "0.3.0"
 description = "GPM: Generative Password Manager."
 license = ".github/LICENSE.md"
 readme = ".github/README.md"
