@@ -35,12 +35,12 @@ def remove_suffix(text: str) -> str:
 def remove_spaces(text: str) -> str:
     return text.replace(' ', '').replace('\t', '')
 
-def filter_ascii(text: str) -> str:
-    return ''.join(__c for __c in text if ord(__c) < 128)
+def reduce_ascii(text: str) -> str:
+    return ''.join(chr(ord(__c) % 128) for __c in text)
 
 def preprocess(target: str, login: str) -> list:
-    __left = remove_suffix(remove_prefix(remove_spaces(filter_ascii(target.lower()))))
-    __right = remove_spaces(filter_ascii(login.lower()))
+    __left = remove_suffix(remove_prefix(remove_spaces(reduce_ascii(target.lower()))))
+    __right = remove_spaces(reduce_ascii(login.lower()))
     return __left + '|' + __right
 
 # ENTROPY #####################################################################
