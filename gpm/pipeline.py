@@ -1,7 +1,8 @@
 import itertools
+import math
 import re
 
-import tensorflow as tf
+import numpy as np
 
 import gpm.model
 import gpm.vocabulary
@@ -54,16 +55,15 @@ def feed(source: list, nonce: int, dimension: int) -> iter:
 
 # INPUTS ######################################################################
 
-def tensor(feed: 'Iterable[int]', length: int, context: int) -> tf.Tensor:
+def tensor(feed: iter, length: int, context: int) -> np.ndarray:
     __x = [[next(feed) for _ in range(context)] for _ in range(length)]
-    return tf.constant(tf.convert_to_tensor(value=__x, dtype=tf.dtypes.int32))
+    return np.array(__x, dtype=np.int32)
 
 # OUTPUTS #####################################################################
 
-def password(model: tf.keras.Model, data: tf.Tensor, itos: callable, separator: str='') -> str:
-    __y = tf.squeeze(model(data, training=False))
-    __p = list(tf.argmax(__y, axis=-1).numpy())
-    return gpm.vocabulary.decode(__p, itos=itos, separator=separator)
+def password(model: gpm.model.MlpModel, data: np.ndarray, itos: callable, separator: str='') -> str:
+    __y = model(data, sample=True).tolist()
+    return gpm.vocabulary.decode(__y, itos=itos, separator=separator)
 
 # PROCESS #####################################################################
 
@@ -91,13 +91,13 @@ def process(
     # output vocabulary
     __output_vocabulary = gpm.vocabulary.compose(lowers=include_lowers, uppers=include_uppers, digits=include_digits, symbols=include_symbols, spaces=include_spaces, words=include_words)
     __output_mappings = gpm.vocabulary.mappings(vocabulary=__output_vocabulary)
-    __output_dim = len(__output_vocabulary)
+    __output_dim = math.ceil(math.log2(len(__output_vocabulary)))
     # inputs
     __inputs = preprocess(target=login_target, login=login_id)
     __source = gpm.vocabulary.encode(text=__inputs, stoi=__input_mappings['encode'])
     __feed = feed(source=__source, nonce=password_nonce, dimension=__input_dim)
     __data = tensor(feed=__feed, length=password_length, context=model_context_dim)
     # model
-    __model = gpm.model.create(key_str=master_key, n_input_dim=__input_dim, n_output_dim=__output_dim, n_context_dim=model_context_dim, n_embedding_dim=model_embedding_dim)
+    __model = gpm.model.MlpModel(key_str=master_key, n_input_dim=__input_dim, n_output_dim=__output_dim, n_context_dim=model_context_dim, n_embedding_dim=model_embedding_dim)
     # password
     return password(model=__model, data=__data, itos=__output_mappings['decode'], separator=__separator)
