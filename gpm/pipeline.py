@@ -60,10 +60,10 @@ def tensor(feed: 'Iterable[int]', length: int, context: int) -> tf.Tensor:
 
 # OUTPUTS #####################################################################
 
-def password(model: tf.keras.Model, x: tf.Tensor, itos: callable) -> str:
-    __y = tf.squeeze(model(x, training=False))
+def password(model: tf.keras.Model, data: tf.Tensor, itos: callable, separator: str='') -> str:
+    __y = tf.squeeze(model(data, training=False))
     __p = list(tf.argmax(__y, axis=-1).numpy())
-    return gpm.vocabulary.decode(__p, itos=itos)
+    return gpm.vocabulary.decode(__p, itos=itos, separator=separator)
 
 # PROCESS #####################################################################
 
@@ -77,24 +77,27 @@ def process(
     include_uppers: bool,
     include_digits: bool,
     include_symbols: bool,
+    include_spaces: bool,
     include_words: bool,
     input_vocabulary: str=INPUT_VOCABULARY,
     model_context_dim: int=N_CONTEXT_DIM,
     model_embedding_dim: int=N_EMBEDDING_DIM
 ) -> str:
+    # separate the words by spaces
+    __separator = int(include_spaces and include_words) * ' '
     # input vocabulary
     __input_mappings = gpm.vocabulary.mappings(vocabulary=input_vocabulary)
     __input_dim = len(input_vocabulary)
     # output vocabulary
-    __output_vocabulary = gpm.vocabulary.compose(lowers=include_lowers, uppers=include_uppers, digits=include_digits, symbols=include_symbols, words=include_words)
+    __output_vocabulary = gpm.vocabulary.compose(lowers=include_lowers, uppers=include_uppers, digits=include_digits, symbols=include_symbols, spaces=include_spaces, words=include_words)
     __output_mappings = gpm.vocabulary.mappings(vocabulary=__output_vocabulary)
     __output_dim = len(__output_vocabulary)
     # inputs
     __inputs = preprocess(target=login_target, login=login_id)
     __source = gpm.vocabulary.encode(text=__inputs, stoi=__input_mappings['encode'])
     __feed = feed(source=__source, nonce=password_nonce, dimension=__input_dim)
-    __x = tensor(feed=__feed, length=password_length, context=model_context_dim)
+    __data = tensor(feed=__feed, length=password_length, context=model_context_dim)
     # model
     __model = gpm.model.create(key_str=master_key, n_input_dim=__input_dim, n_output_dim=__output_dim, n_context_dim=model_context_dim, n_embedding_dim=model_embedding_dim)
     # password
-    return password(model=__model, x=__x, itos=__output_mappings['decode'])
+    return password(model=__model, data=__data, itos=__output_mappings['decode'], separator=__separator)

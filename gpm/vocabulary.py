@@ -7,6 +7,7 @@ PATH = os.path.dirname(os.path.abspath(__file__))
 # ALPHABET #####################################################################
 
 BANNED = ''.join(chr(__i) for __i in (0x20, 0x22, 0x27, 0x28, 0x29, 0x5b, 0x5c, 0x5d, 0x60, 0x7b, 0x7c, 0x7d))  #  "\'()[\\]`{|}
+SPACES = ' '                                                                                                    #
 DIGITS = '0123456789'                                                                                           # 0-9
 UPPERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'                                                                           # A-Z
 LOWERS = UPPERS.lower()                                                                                         # a-z
@@ -23,11 +24,11 @@ def check(text: str, allowed: list) -> bool:
 
 # COMPOSITION ##################################################################
 
-def alphabet(lowers: bool=True, uppers: bool=True, digits: bool=True, symbols: bool=False) -> str:
-    return sorted(set(lowers * LOWERS + uppers * UPPERS + digits * DIGITS + symbols * SYMBOLS))
+def alphabet(lowers: bool=True, uppers: bool=True, digits: bool=True, symbols: bool=False, spaces: bool=False) -> str:
+    return sorted(set(lowers * LOWERS + uppers * UPPERS + digits * DIGITS + symbols * SYMBOLS + spaces * SPACES))
 
-def compose(lowers: bool=True, uppers: bool=True, digits: bool=True, symbols: bool=False, words: bool=False) -> str:
-    __alpha = alphabet(lowers=lowers, uppers=uppers, digits=digits, symbols=symbols)
+def compose(lowers: bool=True, uppers: bool=True, digits: bool=True, symbols: bool=False, spaces: bool=False, words: bool=False) -> str:
+    __alpha = alphabet(lowers=lowers, uppers=uppers, digits=digits, symbols=symbols, spaces=spaces)
     # keep only the words made from the alphabet
     __words = list(filter(lambda __w: check(text=__w, allowed=__alpha), WORDS))
     # choose between character and word levels
@@ -57,5 +58,5 @@ def mappings(vocabulary: list) -> dict:
 def encode(text: str, stoi: callable) -> list:
     return [stoi(__c) for __c in text] # defaults to 0 if a character is not in the vocabulary
 
-def decode(sequence: list, itos: callable) -> list:
-    return ''.join([itos(__i) for __i in sequence]) # defaults to the first character
+def decode(sequence: list, itos: callable, separator: str='') -> list:
+    return separator.join([itos(__i) for __i in sequence]) # defaults to the first character

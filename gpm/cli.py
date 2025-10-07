@@ -21,6 +21,7 @@ def main():
     __parser.add_argument('--uppers', '-A', action='store_false', dest='include_uppers', default=True, help='exclude uppercase letters from the password')
     __parser.add_argument('--digits', '-d', action='store_false', dest='include_digits', default=True, help='exclude digits from the password')
     __parser.add_argument('--symbols', '-s', action='store_true', dest='include_symbols', default=False, help='include symbols in the password')
+    __parser.add_argument('--spaces', '-p', action='store_true', dest='include_spaces', default=False, help='include spaces in the password')
     __parser.add_argument('--words', '-w', action='store_true', dest='include_words', default=False, help='compose the password with whole words')
     # parse
     try:
@@ -58,6 +59,7 @@ _process = functools.partial(
     include_uppers=True,
     include_digits=True,
     include_symbols=False,
+    include_spaces=False,
     include_words=False,
     input_vocabulary=gpm.pipeline.INPUT_VOCABULARY,
     model_context_dim=gpm.pipeline.N_CONTEXT_DIM,
