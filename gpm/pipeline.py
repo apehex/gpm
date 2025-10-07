@@ -82,8 +82,6 @@ def process(
     model_context_dim: int=N_CONTEXT_DIM,
     model_embedding_dim: int=N_EMBEDDING_DIM
 ) -> str:
-    # seed to generate the model weights randomly
-    __seed = gpm.model.seed(key=master_key)
     # input vocabulary
     __input_mappings = gpm.vocabulary.mappings(vocabulary=input_vocabulary)
     __input_dim = len(input_vocabulary)
@@ -97,6 +95,6 @@ def process(
     __feed = feed(source=__source, nonce=password_nonce, dimension=__input_dim)
     __x = tensor(feed=__feed, length=password_length, context=model_context_dim)
     # model
-    __model = gpm.model.create(seed=__seed, n_input_dim=__input_dim, n_output_dim=__output_dim, n_context_dim=model_context_dim, n_embedding_dim=model_embedding_dim)
+    __model = gpm.model.create(key_str=master_key, n_input_dim=__input_dim, n_output_dim=__output_dim, n_context_dim=model_context_dim, n_embedding_dim=model_embedding_dim)
     # password
     return password(model=__model, x=__x, itos=__output_mappings['decode'])

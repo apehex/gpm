@@ -18,16 +18,18 @@ def seed(key: str) -> int:
 
 @functools.lru_cache(maxsize=32)
 def create(
-    seed: int,
+    key_str: str,
     n_input_dim: int,
     n_output_dim: int,
     n_context_dim: int=N_CONTEXT_DIM,
     n_embedding_dim: int=N_EMBEDDING_DIM,
 ) -> tf.keras.Model:
     __model = tf.keras.Sequential()
+    # control the random weight generation
+    __seed = seed(key_str)
     # initialize the weights
-    __embedding_init = tf.keras.initializers.GlorotNormal(seed=seed)
-    __dense_init = tf.keras.initializers.GlorotNormal(seed=(seed ** 2) % (2 ** 32)) # different values
+    __embedding_init = tf.keras.initializers.GlorotNormal(seed=__seed)
+    __dense_init = tf.keras.initializers.GlorotNormal(seed=(__seed ** 2) % (2 ** 32)) # different values
     # embedding
     __model.add(tf.keras.layers.Embedding(input_dim=n_input_dim, output_dim=n_embedding_dim, embeddings_initializer=__embedding_init, name='embedding'))
     # head
