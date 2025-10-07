@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gpmanager"
-version = "0.3.1"
+version = "0.4.0"
 description = "GPM: Generative Password Manager."
 license = ".github/LICENSE.md"
 readme = ".github/README.md"
@@ -9,7 +9,7 @@ packages = [{include="gpm"}]
 
 [tool.poetry.dependencies]
 python = ">=3.10, <3.14"
-tensorflow = ">=2.14"
+numpy = ">=2.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"

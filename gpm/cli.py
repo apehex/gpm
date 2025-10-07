@@ -39,8 +39,8 @@ def main():
             model_context_dim=gpm.pipeline.N_CONTEXT_DIM,
             model_embedding_dim=gpm.pipeline.N_EMBEDDING_DIM,
             **__args)
-    except:
-        pass # automatically prints the help message
+    except Exception as __e:
+        print(__e) # automatically prints the help message
     # return it
     print(__password)
 
