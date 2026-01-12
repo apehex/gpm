@@ -29,8 +29,10 @@ def alphabet(lowers: bool=True, uppers: bool=True, digits: bool=True, symbols: b
 
 def compose(lowers: bool=True, uppers: bool=True, digits: bool=True, symbols: bool=False, spaces: bool=False, words: bool=False) -> str:
     __alpha = alphabet(lowers=lowers, uppers=uppers, digits=digits, symbols=symbols, spaces=spaces)
+    # either all lower or all upper, no mixed case
+    __words = set([__w.lower() for __w in WORDS] + [__w.upper() for __w in WORDS])
     # keep only the words made from the alphabet
-    __words = list(filter(lambda __w: check(text=__w, allowed=__alpha), WORDS))
+    __words = list(filter(lambda __w: check(text=__w, allowed=__alpha), __words))
     # choose between character and word levels
     return __words if words else __alpha
 
